@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar falla | BioTrack</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="encabezado-principal">
+
+    <div class="header-top">
+
+        <div>
+            <h1>BioTrack</h1>
+            <p>Sistema de Gestión de Equipos Médicos</p>
+        </div>
+
+        <div class="usuario-panel">
+
+            <span>
+                {{ usuario_actual.nombre }}
+                <br>
+                <small>{{ usuario_actual.rol|capitalize }}</small>
+            </span>
+
+            <a
+                href="{{ url_for('cerrar_sesion') }}"
+                class="logout-button"
+            >
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+<section class="formulario-card">
+
+<h2>Registrar falla</h2>
+
+<p>
+Equipo:
+<strong>{{ equipo.activo }} — {{ equipo.nombre }}</strong>
+</p>
+
+{% if mensaje %}
+<p class="mensaje">{{ mensaje }}</p>
+{% endif %}
+
+<form method="POST" class="formulario-registro">
+
+<label>Fecha</label>
+
+<input
+type="date"
+name="fecha"
+required
+>
+
+<label>Falla reportada</label>
+
+<textarea
+name="falla_reportada"
+rows="4"
+required
+></textarea>
+
+<label>Diagnóstico</label>
+
+<textarea
+name="diagnostico"
+rows="4"
+required
+></textarea>
+
+<label>Acción realizada</label>
+
+<textarea
+name="accion_realizada"
+rows="4"
+required
+></textarea>
+
+<label>Tiempo fuera de servicio</label>
+
+<input
+type="text"
+name="tiempo_fuera_servicio"
+placeholder="Ej. 3 horas"
+required
+>
+
+<div class="formulario-acciones">
+
+<button
+type="submit"
+class="manual-button"
+>
+Guardar falla
+</button>
+
+<a
+href="{{ url_for('ver_equipo', activo=equipo.activo) }}"
+class="boton-secundario"
+>
+Cancelar
+</a>
+
+</div>
+
+</form>
+
+</section>
+
+</main>
+
+</body>
+</html>

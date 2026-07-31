@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BioTrack</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado-principal">
+
+    <div class="header-top">
+
+        <div>
+            <h1>BioTrack</h1>
+            <p>Sistema de Gestión de Equipos Médicos</p>
+        </div>
+
+        <div class="usuario-panel">
+
+            <span>
+                {{ usuario_actual.nombre }}
+                <br>
+                <small>{{ usuario_actual.rol|capitalize }}</small>
+            </span>
+
+            <a
+                href="{{ url_for('cerrar_sesion') }}"
+                class="logout-button"
+            >
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+    <main class="container">
+                <section class="panel-alertas">
+            <div class="panel-alertas-encabezado">
+                <div>
+                    <h2>Panel de control</h2>
+                    <p>Estado general al {{ fecha_actual }}</p>
+                </div>
+
+                <span class="contador-alertas">
+                    {{ cantidad_alertas }} alertas
+                </span>
+            </div>
+
+            <div class="resumen-grid">
+                <article class="resumen-card resumen-total">
+                    <span>Equipos registrados</span>
+                    <strong>{{ resumen.total }}</strong>
+                </article>
+
+                <article class="resumen-card resumen-operativo">
+                    <span>Operativos</span>
+                    <strong>{{ resumen.operativos }}</strong>
+                </article>
+
+                <article class="resumen-card resumen-mantenimiento">
+                    <span>En mantenimiento</span>
+                    <strong>{{ resumen.mantenimiento }}</strong>
+                </article>
+
+                <article class="resumen-card resumen-fuera">
+                    <span>Fuera de servicio</span>
+                    <strong>{{ resumen.fuera_servicio }}</strong>
+                </article>
+            </div>
+
+            <div class="alertas-grid">
+
+                {% if alertas_criticas %}
+                    <article class="alerta-card alerta-critica">
+                        <h3>Equipos fuera de servicio</h3>
+
+                        {% for alerta in alertas_criticas %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }} — {{ alerta.estado }}
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if equipos_mantenimiento %}
+                    <article class="alerta-card alerta-mantenimiento">
+                        <h3>Equipos en mantenimiento</h3>
+
+                        {% for alerta in equipos_mantenimiento %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }} — {{ alerta.estado }}
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if mantenimientos_vencidos %}
+                    <article class="alerta-card alerta-vencida">
+                        <h3>Mantenimientos vencidos</h3>
+
+                        {% for alerta in mantenimientos_vencidos %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — venció el {{ alerta.fecha_texto }}
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if mantenimientos_proximos %}
+                    <article class="alerta-card alerta-proxima">
+                        <h3>Mantenimientos próximos</h3>
+
+                        {% for alerta in mantenimientos_proximos %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — {{ alerta.fecha_texto }}
+                                — faltan {{ alerta.dias }} días
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if calibraciones_vencidas %}
+                    <article class="alerta-card alerta-vencida">
+                        <h3>Calibraciones vencidas</h3>
+
+                        {% for alerta in calibraciones_vencidas %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — venció el {{ alerta.fecha_texto }}
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if calibraciones_proximas %}
+                    <article class="alerta-card alerta-calibracion">
+                        <h3>Calibraciones próximas</h3>
+
+                        {% for alerta in calibraciones_proximas %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — {{ alerta.fecha_texto }}
+                                — faltan {{ alerta.dias }} días
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if garantias_vencidas %}
+                    <article class="alerta-card alerta-garantia">
+                        <h3>Garantías vencidas</h3>
+
+                        {% for alerta in garantias_vencidas %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — venció el {{ alerta.fecha_texto }}
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if garantias_proximas %}
+                    <article class="alerta-card alerta-proxima">
+                        <h3>Garantías próximas a vencer</h3>
+
+                        {% for alerta in garantias_proximas %}
+                            <a href="{{ url_for('ver_equipo', activo=alerta.activo) }}">
+                                <strong>{{ alerta.activo }}</strong>
+                                — {{ alerta.nombre }}
+                                — {{ alerta.fecha_texto }}
+                                — faltan {{ alerta.dias }} días
+                            </a>
+                        {% endfor %}
+                    </article>
+                {% endif %}
+
+                {% if cantidad_alertas == 0 %}
+                    <article class="alerta-card alerta-correcta">
+                        <h3>Sin alertas pendientes</h3>
+                        <p>Todos los equipos están al día.</p>
+                    </article>
+                {% endif %}
+
+            </div>
+        </section>
+        <section class="search-box">
+            <h2>Buscar equipo</h2>
+
+            <form method="POST">
+                <input
+                    type="text"
+                    name="activo"
+                    placeholder="Ejemplo: ACT-001"
+                    required
+                >
+
+                <button type="submit">Buscar</button>
+            </form>
+
+            {% if mensaje %}
+                <p class="mensaje">{{ mensaje }}</p>
+            {% endif %}
+        </section>
+
+
+        {% if equipo %}
+
+            <section class="equipo-encabezado">
+                
+                <div class="foto-equipo">
+                    <img
+                        src="{{ url_for('static', filename=imagen_equipo) }}"
+                        alt="Fotografía de {{ equipo.nombre }}"
+                        onerror="
+                            this.style.display='none';
+                            this.nextElementSibling.style.display='flex';
+                        "
+                    >
+
+                    <div
+                        style="
+                            display: none;
+                            width: 100%;
+                            height: 230px;
+                            align-items: center;
+                            justify-content: center;
+                            text-align: center;
+                            background: #f7fafc;
+                            border: 3px solid #d5e7f3;
+                            border-radius: 12px;
+                            color: #64748b;
+                            font-weight: bold;
+                            padding: 20px;
+                        "
+                    >
+                        Fotografía no disponible
+                    </div>
+                </div>
+
+                <div class="datos-encabezado">
+                    <span
+                        class="estado-equipo"
+                        data-estado="{{ equipo.estado|lower }}"
+                    >
+                         {{ equipo.estado }}
+                    </span>
+
+                    <h2>{{ equipo.nombre }}</h2>
+
+                    <p><strong>Activo:</strong> {{ equipo.activo }}</p>
+                    <p><strong>Marca:</strong> {{ equipo.marca }}</p>
+                    <p><strong>Modelo:</strong> {{ equipo.modelo }}</p>
+                    <p><strong>Serie:</strong> {{ equipo.serie }}</p>
+                    <p><strong>Ubicación:</strong> {{ equipo.ubicacion }}</p>
+                </div>
+
+                <div class="qr-equipo">
+                    <h3>Código QR</h3>
+
+                    <img
+                        src="{{ url_for('static', filename=imagen_qr) }}"
+                        alt="Código QR de {{ equipo.activo }}"
+                    >
+
+                    <p>{{ equipo.activo }}</p>
+                    <small>Escaneá para abrir la ficha del equipo</small>
+                </div>
+
+            </section>
+
+
+            <nav class="tabs">
+
+                <button
+                    type="button"
+                    class="tab-button active"
+                    onclick="mostrarPestana('general', this)"
+                >
+                    Información general
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('tecnica', this)"
+                >
+                    Información técnica
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('parametros', this)"
+                >
+                    Parámetros
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('configuracion', this)"
+                >
+                    Configuración
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('regulatoria', this)"
+                >
+                    Información regulatoria
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('mantenimientos', this)"
+                >
+                    Mantenimientos
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('calibraciones', this)"
+                >
+                    Calibraciones
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('fallas', this)"
+                >
+                    Fallas
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('indicadores', this)"
+                >
+                    Indicadores
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('economica', this)"
+                >
+                    Información económica
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-button"
+                    onclick="mostrarPestana('documentos', this)"
+                >
+                    Manual
+                </button>
+
+            </nav>
+
+
+            <section id="general" class="tab-content active">
+                <h2>Información general</h2>
+
+                <div class="datos-grid">
+                    <p><strong>Activo:</strong> {{ equipo.activo }}</p>
+                    <p><strong>Código QR:</strong> {{ equipo.codigo_qr }}</p>
+                    <p><strong>Nombre:</strong> {{ equipo.nombre }}</p>
+                    <p><strong>Tipo de equipo:</strong> {{ equipo.tipo_equipo }}</p>
+                    <p><strong>Marca:</strong> {{ equipo.marca }}</p>
+                    <p><strong>Modelo:</strong> {{ equipo.modelo }}</p>
+                    <p><strong>Serie:</strong> {{ equipo.serie }}</p>
+                    <p><strong>Fabricante:</strong> {{ equipo.fabricante }}</p>
+                    <p><strong>País:</strong> {{ equipo.pais_fabricacion }}</p>
+                    <p><strong>Año:</strong> {{ equipo.anio_fabricacion }}</p>
+                    <p><strong>Fecha de compra:</strong> {{ equipo.fecha_compra }}</p>
+                    <p><strong>Fecha de ingreso:</strong> {{ equipo.fecha_ingreso }}</p>
+                    <p><strong>Ubicación:</strong> {{ equipo.ubicacion }}</p>
+                    <p><strong>Servicio:</strong> {{ equipo.servicio }}</p>
+                    <p><strong>Responsable:</strong> {{ equipo.responsable }}</p>
+                    <p><strong>Estado:</strong> {{ equipo.estado }}</p>
+                    <p><strong>Criticidad:</strong> {{ equipo.criticidad }}</p>
+                    <p><strong>Vida útil:</strong> {{ equipo.vida_util_estimada }}</p>
+                </div>
+
+                <div class="observaciones">
+                    <strong>Observaciones:</strong>
+                    {{ equipo.observaciones }}
+                </div>
+            </section>
+
+
+            <section id="tecnica" class="tab-content">
+                <h2>Información técnica</h2>
+
+                {% if informacion_tecnica %}
+                    <div class="datos-grid">
+                        <p><strong>Voltaje:</strong> {{ informacion_tecnica.voltaje_alimentacion }}</p>
+                        <p><strong>Tipo de batería:</strong> {{ informacion_tecnica.tipo_bateria }}</p>
+                        <p><strong>Capacidad:</strong> {{ informacion_tecnica.capacidad_bateria }}</p>
+                        <p><strong>Protección IP:</strong> {{ informacion_tecnica.grado_proteccion_ip }}</p>
+                        <p><strong>Peso:</strong> {{ informacion_tecnica.peso }}</p>
+                        <p><strong>Dimensiones:</strong> {{ informacion_tecnica.dimensiones }}</p>
+                    </div>
+                {% else %}
+                    <p>No hay información técnica registrada.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="parametros" class="tab-content">
+                <h2>Parámetros monitorizados</h2>
+
+                {% if parametros %}
+                    <div class="datos-grid">
+                        <p>{{ parametros.ecg }}</p>
+                        <p>{{ parametros.frecuencia_cardiaca }}</p>
+                        <p>{{ parametros.frecuencia_respiratoria }}</p>
+                        <p>{{ parametros.spo2 }}</p>
+                        <p>{{ parametros.nibp }}</p>
+                        <p>{{ parametros.temperatura }}</p>
+                        <p>{{ parametros.ibp }}</p>
+                        <p>{{ parametros.etco2 }}</p>
+                    </div>
+                {% else %}
+                    <p>No hay parámetros registrados.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="configuracion" class="tab-content">
+                <h2>Configuración</h2>
+
+                {% if configuracion %}
+                    <div class="datos-grid">
+                        <p><strong>Software:</strong> {{ configuracion.version_software }}</p>
+                        <p><strong>Firmware:</strong> {{ configuracion.version_firmware }}</p>
+                        <p><strong>Idioma:</strong> {{ configuracion.idioma }}</p>
+                        <p><strong>Conectividad:</strong> {{ configuracion.conectividad }}</p>
+                    </div>
+                {% else %}
+                    <p>No hay configuración registrada.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="regulatoria" class="tab-content">
+                <h2>Información regulatoria</h2>
+
+                {% if informacion_regulatoria %}
+                    <div class="datos-grid">
+                        <p><strong>Registro sanitario:</strong> {{ informacion_regulatoria.registro_sanitario }}</p>
+                        <p><strong>FDA:</strong> {{ informacion_regulatoria.fda }}</p>
+                        <p><strong>Norma:</strong> {{ informacion_regulatoria.norma }}</p>
+                        <p><strong>Clasificación de riesgo:</strong> {{ informacion_regulatoria.clasificacion_riesgo }}</p>
+                    </div>
+                {% else %}
+                    <p>No hay información regulatoria registrada.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="mantenimientos" class="tab-content">
+                <h2>Historial de mantenimientos</h2>
+                {% if puede_registrar %}
+                <div style="margin-bottom:20px;">
+                    <a
+                        class="manual-button"
+                        href="{{ url_for(
+                            'registrar_mantenimiento',
+                            activo=equipo.activo
+                        ) }}"
+                    >
+                        + Registrar mantenimiento
+                    </a>
+            </div>
+            {% endif %}
+                {% if mantenimientos %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Técnico</th>
+                                    <th>Descripción</th>
+                                    <th>Repuestos</th>
+                                    <th>Próximo mantenimiento</th>
+                                {% if es_administrador %}
+                                    <th>Acciones</th>
+                                {% endif %}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for mantenimiento in mantenimientos %}
+                                    <tr>
+                                        <td>{{ mantenimiento.fecha }}</td>
+                                        <td>{{ mantenimiento.tipo }}</td>
+                                        <td>{{ mantenimiento.tecnico_responsable }}</td>
+                                        <td>{{ mantenimiento.descripcion }}</td>
+                                        <td>{{ mantenimiento.repuestos_utilizados or "No aplica" }}</td>
+                                        <td>{{ mantenimiento.proximo_mantenimiento or "No definido" }}</td>
+                                    {% if es_administrador %}
+                                        <td class="acciones-tabla">
+
+                                             <a
+                                                 href="{{ url_for(
+                                                    'editar_mantenimiento',
+                                                 mantenimiento_id=mantenimiento.id
+                                            ) }}"
+                                            class="boton-editar"
+                                        >
+                                            Editar
+                                        </a>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'eliminar_mantenimiento',
+                                                mantenimiento_id=mantenimiento.id
+                                            ) }}"
+                                            onsubmit="
+                                                return confirm(
+                                                    '¿Está seguro de eliminar este mantenimiento?'
+                                                );
+                                            "
+                                        >
+                                            <button type="submit" class="boton-eliminar">
+                                                Eliminar
+                                            </button>
+                                        </form>
+
+                                    </td>
+                                {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No hay mantenimientos registrados.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="calibraciones" class="tab-content">
+                <h2>Historial de calibraciones</h2>
+                {% if puede_registrar %}
+                <div style="margin-bottom:20px;">
+                     <a
+                        class="manual-button"
+                        href="{{ url_for(
+                            'registrar_calibracion',
+                            activo=equipo.activo
+                        ) }}"
+                    >
+                        + Registrar calibración
+                    </a>
+            </div>
+            {% endif %}
+                {% if calibraciones %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Resultado</th>
+                                    <th>Certificado</th>
+                                    <th>Patrón utilizado</th>
+                                    <th>Próxima calibración</th>
+                                {% if es_administrador %}
+                                    <th>Acciones</th>
+                                {% endif %}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for calibracion in calibraciones %}
+                                    <tr>
+                                        <td>{{ calibracion.fecha }}</td>
+                                        <td>{{ calibracion.resultado }}</td>
+                                        <td>{{ calibracion.certificado }}</td>
+                                        <td>{{ calibracion.patron_utilizado }}</td>
+                                        <td>{{ calibracion.proxima_calibracion or "No definida" }}</td>
+                                        {% if es_administrador %}
+    <td class="acciones-tabla">
+
+        <a
+            href="{{ url_for(
+                'editar_calibracion',
+                calibracion_id=calibracion.id
+            ) }}"
+            class="boton-editar"
+        >
+            Editar
+        </a>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'eliminar_calibracion',
+                calibracion_id=calibracion.id
+            ) }}"
+            onsubmit="
+                return confirm(
+                    '¿Está seguro de eliminar esta calibración?'
+                );
+            "
+        >
+            <button type="submit" class="boton-eliminar">
+                Eliminar
+            </button>
+        </form>
+
+    </td>
+{% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No hay calibraciones registradas.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="fallas" class="tab-content">
+                <h2>Historial de fallas</h2>
+                {% if puede_registrar %}
+                <div style="margin-bottom:20px;">
+                    <a
+    class="manual-button"
+    href="{{ url_for(
+        'registrar_falla',
+        activo=equipo.activo
+    ) }}"
+>
+    + Registrar falla
+</a>
+                </div>
+                {% endif %}
+                {% if fallas %}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Falla reportada</th>
+                                    <th>Diagnóstico</th>
+                                    <th>Acción realizada</th>
+                                    <th>Tiempo fuera de servicio</th>
+                                    {% if es_administrador %}
+    <th>Acciones</th>
+{% endif %}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for falla in fallas %}
+                                    <tr>
+                                        <td>{{ falla.fecha }}</td>
+                                        <td>{{ falla.falla_reportada }}</td>
+                                        <td>{{ falla.diagnostico }}</td>
+                                        <td>{{ falla.accion_realizada }}</td>
+                                        <td>{{ falla.tiempo_fuera_servicio }}</td>
+                                        {% if es_administrador %}
+    <td class="acciones-tabla">
+
+        <a
+            href="{{ url_for(
+                'editar_falla',
+                falla_id=falla.id
+            ) }}"
+            class="boton-editar"
+        >
+            Editar
+        </a>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'eliminar_falla',
+                falla_id=falla.id
+            ) }}"
+            onsubmit="
+                return confirm(
+                    '¿Está seguro de eliminar esta falla?'
+                );
+            "
+        >
+            <button type="submit" class="boton-eliminar">
+                Eliminar
+            </button>
+        </form>
+
+    </td>
+{% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No hay fallas registradas.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="indicadores" class="tab-content">
+                <h2>Indicadores</h2>
+
+                {% if indicadores %}
+                    <div class="indicadores-grid">
+                        <article class="indicador-card">
+                            <span>Disponibilidad</span>
+                            <strong>{{ indicadores.disponibilidad }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Horas de operación</span>
+                            <strong>{{ indicadores.horas_operacion }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Mantenimientos preventivos</span>
+                            <strong>{{ indicadores.mantenimientos_preventivos }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Mantenimientos correctivos</span>
+                            <strong>{{ indicadores.mantenimientos_correctivos }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Calibraciones</span>
+                            <strong>{{ indicadores.calibraciones }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Tiempo fuera de servicio</span>
+                            <strong>{{ indicadores.tiempo_fuera_servicio }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>MTBF</span>
+                            <strong>{{ indicadores.mtbf }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>MTTR</span>
+                            <strong>{{ indicadores.mttr }}</strong>
+                        </article>
+
+                        <article class="indicador-card">
+                            <span>Cumplimiento</span>
+                            <strong>{{ indicadores.cumplimiento_mantenimiento }}</strong>
+                        </article>
+                    </div>
+                {% else %}
+                    <p>No hay indicadores registrados.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="economica" class="tab-content">
+                <h2>Información económica</h2>
+
+                {% if informacion_economica %}
+                    <div class="datos-grid">
+                        <p>
+                            <strong>Costo de adquisición:</strong>
+                            ${{ "%.2f"|format(informacion_economica.costo_adquisicion) }}
+                        </p>
+
+                        <p>
+                            <strong>Garantía:</strong>
+                            {{ informacion_economica.garantia }}
+                        </p>
+
+                        <p>
+                            <strong>Vencimiento de garantía:</strong>
+                            {{ informacion_economica.vencimiento_garantia }}
+                        </p>
+
+                        <p>
+                            <strong>Mantenimiento preventivo:</strong>
+                            ${{ "%.2f"|format(informacion_economica.costo_mantenimiento_preventivo) }}
+                        </p>
+
+                        <p>
+                            <strong>Reparaciones:</strong>
+                            ${{ "%.2f"|format(informacion_economica.costo_reparaciones) }}
+                        </p>
+
+                        <p>
+                            <strong>Total de repuestos:</strong>
+                            ${{ "%.2f"|format(informacion_economica.costo_total_repuestos) }}
+                        </p>
+                    </div>
+                {% else %}
+                    <p>No hay información económica registrada.</p>
+                {% endif %}
+            </section>
+
+
+            <section id="documentos" class="tab-content">
+                <h2>Manual del usuario</h2>
+
+                {% if documentos and documentos.manual_usuario %}
+                    <a
+                        class="manual-button"
+                        href="{{ documentos.manual_usuario }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir Manual del Usuario
+                    </a>
+                {% else %}
+                    <p>No hay un manual registrado.</p>
+                {% endif %}
+            </section>
+
+        {% endif %}
+
+    </main>
+
+
+    <script>
+        function mostrarPestana(idPestana, botonSeleccionado) {
+            const pestanas = document.querySelectorAll(".tab-content");
+            const botones = document.querySelectorAll(".tab-button");
+
+            pestanas.forEach(function (pestana) {
+                pestana.classList.remove("active");
+            });
+
+            botones.forEach(function (boton) {
+                boton.classList.remove("active");
+            });
+
+            document.getElementById(idPestana).classList.add("active");
+            botonSeleccionado.classList.add("active");
+        }
+    </script>
+
+</body>
+
+</html>

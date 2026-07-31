@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar falla | BioTrack</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado-principal">
+        <div class="header-top">
+            <div>
+                <h1>BioTrack</h1>
+                <p>Sistema de Gestión de Equipos Médicos</p>
+            </div>
+
+            <div class="usuario-panel">
+                <span>
+                    {{ usuario_actual.nombre }}
+                    <br>
+                    <small>{{ usuario_actual.rol|capitalize }}</small>
+                </span>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="logout-button"
+                >
+                    Cerrar sesión
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="formulario-card">
+
+            <h2>Editar falla</h2>
+
+            <p>
+                Equipo:
+                <strong>{{ falla.activo }} — {{ equipo.nombre }}</strong>
+            </p>
+
+            {% if mensaje %}
+                <p class="mensaje">{{ mensaje }}</p>
+            {% endif %}
+
+            <form method="POST" class="formulario-registro">
+
+                <label for="fecha">Fecha</label>
+                <input
+                    type="date"
+                    id="fecha"
+                    name="fecha"
+                    value="{{ falla.fecha or '' }}"
+                    required
+                >
+
+                <label for="falla_reportada">Falla reportada</label>
+                <textarea
+                    id="falla_reportada"
+                    name="falla_reportada"
+                    rows="4"
+                    required
+                >{{ falla.falla_reportada or '' }}</textarea>
+
+                <label for="diagnostico">Diagnóstico</label>
+                <textarea
+                    id="diagnostico"
+                    name="diagnostico"
+                    rows="4"
+                    required
+                >{{ falla.diagnostico or '' }}</textarea>
+
+                <label for="accion_realizada">Acción realizada</label>
+                <textarea
+                    id="accion_realizada"
+                    name="accion_realizada"
+                    rows="4"
+                    required
+                >{{ falla.accion_realizada or '' }}</textarea>
+
+                <label for="tiempo_fuera_servicio">
+                    Tiempo fuera de servicio
+                </label>
+                <input
+                    type="text"
+                    id="tiempo_fuera_servicio"
+                    name="tiempo_fuera_servicio"
+                    value="{{ falla.tiempo_fuera_servicio or '' }}"
+                    required
+                >
+
+                <div class="formulario-acciones">
+                    <button type="submit" class="manual-button">
+                        Guardar cambios
+                    </button>
+
+                    <a
+                        href="{{ url_for(
+                            'ver_equipo',
+                            activo=falla.activo
+                        ) }}"
+                        class="boton-secundario"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

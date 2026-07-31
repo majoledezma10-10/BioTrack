@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar mantenimiento | BioTrack</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado-principal">
+        <div class="header-top">
+            <div>
+                <h1>BioTrack</h1>
+                <p>Sistema de Gestión de Equipos Médicos</p>
+            </div>
+
+            <div class="usuario-panel">
+                <span>
+                    {{ usuario_actual.nombre }}
+                    <br>
+                    <small>{{ usuario_actual.rol|capitalize }}</small>
+                </span>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="logout-button"
+                >
+                    Cerrar sesión
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="formulario-card">
+
+            <h2>Editar mantenimiento</h2>
+
+            <p>
+                Equipo:
+                <strong>
+                    {{ mantenimiento.activo }} — {{ equipo.nombre }}
+                </strong>
+            </p>
+
+            {% if mensaje %}
+                <p class="mensaje">{{ mensaje }}</p>
+            {% endif %}
+
+            <form method="POST" class="formulario-registro">
+
+                <label for="fecha">Fecha</label>
+                <input
+                    type="date"
+                    id="fecha"
+                    name="fecha"
+                    value="{{ mantenimiento.fecha or '' }}"
+                    required
+                >
+
+                <label for="tipo">Tipo de mantenimiento</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Seleccione una opción</option>
+
+                    <option
+                        value="Preventivo"
+                        {% if mantenimiento.tipo == "Preventivo" %}
+                            selected
+                        {% endif %}
+                    >
+                        Preventivo
+                    </option>
+
+                    <option
+                        value="Correctivo"
+                        {% if mantenimiento.tipo == "Correctivo" %}
+                            selected
+                        {% endif %}
+                    >
+                        Correctivo
+                    </option>
+
+                    <option
+                        value="Inspección"
+                        {% if mantenimiento.tipo == "Inspección" %}
+                            selected
+                        {% endif %}
+                    >
+                        Inspección
+                    </option>
+                </select>
+
+                <label for="tecnico_responsable">
+                    Técnico responsable
+                </label>
+                <input
+                    type="text"
+                    id="tecnico_responsable"
+                    name="tecnico_responsable"
+                    value="{{ mantenimiento.tecnico_responsable or '' }}"
+                    required
+                >
+
+                <label for="descripcion">Descripción</label>
+                <textarea
+                    id="descripcion"
+                    name="descripcion"
+                    rows="5"
+                    required
+                >{{ mantenimiento.descripcion or '' }}</textarea>
+
+                <label for="repuestos_utilizados">
+                    Repuestos utilizados
+                </label>
+                <textarea
+                    id="repuestos_utilizados"
+                    name="repuestos_utilizados"
+                    rows="3"
+                >{{ mantenimiento.repuestos_utilizados or '' }}</textarea>
+
+                <label for="proximo_mantenimiento">
+                    Próximo mantenimiento
+                </label>
+                <input
+                    type="date"
+                    id="proximo_mantenimiento"
+                    name="proximo_mantenimiento"
+                    value="{{ mantenimiento.proximo_mantenimiento or '' }}"
+                >
+
+                <div class="formulario-acciones">
+                    <button type="submit" class="manual-button">
+                        Guardar cambios
+                    </button>
+
+                    <a
+                        href="{{ url_for(
+                            'ver_equipo',
+                            activo=mantenimiento.activo
+                        ) }}"
+                        class="boton-secundario"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
