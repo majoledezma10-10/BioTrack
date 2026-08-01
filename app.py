@@ -88,8 +88,8 @@ def roles_requeridos(*roles_permitidos):
         @wraps(funcion)
         def envoltura(*args, **kwargs):
             if "usuario_id" not in session:
-    session["pagina_pendiente"] = request.path
-    return redirect(url_for("login"))
+                session["pagina_pendiente"] = request.path
+                return redirect(url_for("login"))
 
             if session.get("rol") not in roles_permitidos:
                 return (
