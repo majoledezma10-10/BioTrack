@@ -11,8 +11,8 @@ except ImportError:
 CARPETA_PROYECTO = Path(__file__).resolve().parent
 CARPETA_QR = CARPETA_PROYECTO / "static" / "qr"
 
-# Mientras BioTrack funciona localmente:
-URL_BASE = "http://127.0.0.1:5000"
+# BioTrack publicado en Internet
+URL_BASE = "https://daniymajo.pythonanywhere.com"
 
 ACTIVOS = (
     "ACT-001",
