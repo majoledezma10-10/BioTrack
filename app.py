@@ -75,6 +75,7 @@ def login_requerido(funcion):
     @wraps(funcion)
     def envoltura(*args, **kwargs):
         if "usuario_id" not in session:
+            session["pagina_pendiente"] = request.path
             return redirect(url_for("login"))
 
         return funcion(*args, **kwargs)
@@ -87,7 +88,8 @@ def roles_requeridos(*roles_permitidos):
         @wraps(funcion)
         def envoltura(*args, **kwargs):
             if "usuario_id" not in session:
-                return redirect(url_for("login"))
+    session["pagina_pendiente"] = request.path
+    return redirect(url_for("login"))
 
             if session.get("rol") not in roles_permitidos:
                 return (
@@ -547,15 +549,21 @@ def login():
 
                     conexion.commit()
 
-                    session.clear()
-                    session.permanent = True
+               pagina_pendiente = session.get("pagina_pendiente")
 
-                    session["usuario_id"] = usuario["id"]
-                    session["nombre"] = usuario["nombre"]
-                    session["nombre_usuario"] = usuario["nombre_usuario"]
-                    session["rol"] = usuario["rol"]
+session.clear()
+session.permanent = True
 
-                    return redirect(url_for("inicio"))
+session["usuario_id"] = usuario["id"]
+session["nombre"] = usuario["nombre"]
+session["nombre_usuario"] = usuario["nombre_usuario"]
+session["rol"] = usuario["rol"]
+
+if pagina_pendiente:
+    return redirect(pagina_pendiente)
+
+return redirect(url_for("inicio"))
+
 
             except sqlite3.Error as error:
                 conexion.rollback()
