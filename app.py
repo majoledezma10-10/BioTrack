@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 import sqlite3
 
 from flask import (
@@ -14,6 +15,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash
 
+load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get(
