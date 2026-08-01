@@ -549,20 +549,20 @@ def login():
 
                     conexion.commit()
 
-               pagina_pendiente = session.get("pagina_pendiente")
+                    pagina_pendiente = session.get("pagina_pendiente")
 
-session.clear()
-session.permanent = True
+                    session.clear()
+                    session.permanent = True
 
-session["usuario_id"] = usuario["id"]
-session["nombre"] = usuario["nombre"]
-session["nombre_usuario"] = usuario["nombre_usuario"]
-session["rol"] = usuario["rol"]
+                    session["usuario_id"] = usuario["id"]
+                    session["nombre"] = usuario["nombre"]
+                    session["nombre_usuario"] = usuario["nombre_usuario"]
+                    session["rol"] = usuario["rol"]
 
-if pagina_pendiente:
-    return redirect(pagina_pendiente)
+                    if pagina_pendiente:
+                        return redirect(pagina_pendiente)
 
-return redirect(url_for("inicio"))
+                    return redirect(url_for("inicio"))
 
 
             except sqlite3.Error as error:
